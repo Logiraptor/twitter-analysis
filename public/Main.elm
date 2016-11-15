@@ -2,6 +2,7 @@ port module Main exposing (..)
 
 import Html.App as App
 import Html.Attributes as Attributes
+import Html.Events as Events
 import Html
 import WebSocket
 import Navigation
@@ -18,12 +19,14 @@ type alias Tweet =
 type alias Model =
     { location : Navigation.Location
     , tweets : List Tweet
+    , paused : Bool
     }
 
 
 type Msg
     = NewLocation Navigation.Location
     | NewTweet Tweet
+    | TogglePause
 
 
 main : Program Never
@@ -40,18 +43,28 @@ main =
 
 model : Navigation.Location -> ( Model, Cmd Msg )
 model loc =
-    ( { location = loc, tweets = [] }, Cmd.none )
+    ( { location = loc, tweets = [], paused = True }, Cmd.none )
 
 
 view : Model -> Html.Html Msg
 view model =
-    Html.div
-        [ Attributes.style
-            [ ( "height", "400px" )
-            , ( "overflow", "auto" )
+    Html.div []
+        [ Html.button [ Events.onClick TogglePause ]
+            [ Html.text
+                (if model.paused then
+                    "Start"
+                 else
+                    "Stop"
+                )
             ]
+        , Html.div
+            [ Attributes.style
+                [ ( "height", "400px" )
+                , ( "overflow", "auto" )
+                ]
+            ]
+            (List.concatMap viewTweet model.tweets)
         ]
-        (List.concatMap viewTweet model.tweets)
 
 
 viewTweet : Tweet -> List (Html.Html Msg)
@@ -61,15 +74,20 @@ viewTweet tweet =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    let
-        url =
-            "ws://" ++ model.location.host ++ "/tweets"
-    in
-        WebSocket.listen url
-            (decodeString decodeTweet
-                >> Result.withDefault { text = "Error", location = ( 0, 0 ) }
-                >> NewTweet
-            )
+    case model.paused of
+        True ->
+            Sub.none
+
+        False ->
+            let
+                url =
+                    "ws://" ++ model.location.host ++ "/tweets"
+            in
+                WebSocket.listen url
+                    (decodeString decodeTweet
+                        >> Result.withDefault { text = "Error", location = ( 0, 0 ) }
+                        >> NewTweet
+                    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,6 +103,9 @@ update msg model =
                         |> List.take 100
             in
                 ( { model | tweets = newTweets }, coords tweet.location )
+
+        TogglePause ->
+            ( { model | paused = not model.paused }, Cmd.none )
 
 
 urlUpdate : Navigation.Location -> Model -> ( Model, Cmd Msg )
