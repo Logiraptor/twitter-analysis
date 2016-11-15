@@ -37,6 +37,7 @@ func tweetHandler(rw http.ResponseWriter, req *http.Request) {
 			log.Println(err.Error())
 			return
 		}
+		defer resp.Body.Close()
 
 		scan := bufio.NewScanner(resp.Body)
 		for scan.Scan() {
