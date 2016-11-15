@@ -44,6 +44,10 @@
                         var node = document.createTextNode(data.text);
                         output.appendChild(node);
                         output.appendChild(document.createElement("br"));
+
+                        if (output.children.length > 100) {
+                            output.removeChild(output.firstChild);
+                        }
                     }
                 }
             }
