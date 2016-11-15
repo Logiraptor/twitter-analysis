@@ -7,9 +7,16 @@ import Html
 import WebSocket
 import Navigation
 import Json.Decode exposing (..)
+import String
 
 
 port coords : ( Float, Float ) -> Cmd msg
+
+
+port resetView : () -> Cmd msg
+
+
+port mapView : (( Float, Float, Float, Float ) -> msg) -> Sub msg
 
 
 type alias Tweet =
@@ -20,6 +27,7 @@ type alias Model =
     { location : Navigation.Location
     , tweets : List Tweet
     , paused : Bool
+    , boundingBox : ( Float, Float, Float, Float )
     }
 
 
@@ -27,6 +35,8 @@ type Msg
     = NewLocation Navigation.Location
     | NewTweet Tweet
     | TogglePause
+    | FilterToView
+    | NewView ( Float, Float, Float, Float )
 
 
 main : Program Never
@@ -43,7 +53,7 @@ main =
 
 model : Navigation.Location -> ( Model, Cmd Msg )
 model loc =
-    ( { location = loc, tweets = [], paused = True }, Cmd.none )
+    ( { location = loc, tweets = [], paused = True, boundingBox = ( -142.29531250000002, 21.07961382717576, -54.40468750000002, 54.082101510457534 ) }, Cmd.none )
 
 
 view : Model -> Html.Html Msg
@@ -56,6 +66,9 @@ view model =
                  else
                     "Stop"
                 )
+            ]
+        , Html.button [ Events.onClick FilterToView ]
+            [ Html.text "Filter tweets not in current view"
             ]
         , Html.div
             [ Attributes.style
@@ -74,14 +87,27 @@ viewTweet tweet =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
+    Sub.batch [ tweetStream model, mapView NewView ]
+
+
+tweetStream : Model -> Sub Msg
+tweetStream model =
     case model.paused of
         True ->
             Sub.none
 
         False ->
             let
+                ( a, b, c, d ) =
+                    model.boundingBox
+
+                location =
+                    [ a, b, c, d ]
+                        |> List.map toString
+                        |> String.join ","
+
                 url =
-                    "ws://" ++ model.location.host ++ "/tweets"
+                    "ws://" ++ model.location.host ++ "/tweets?locations=" ++ location
             in
                 WebSocket.listen url
                     (decodeString decodeTweet
@@ -106,6 +132,12 @@ update msg model =
 
         TogglePause ->
             ( { model | paused = not model.paused }, Cmd.none )
+
+        FilterToView ->
+            ( model, resetView () )
+
+        NewView v ->
+            ( { model | boundingBox = v, tweets = [] }, Cmd.none )
 
 
 urlUpdate : Navigation.Location -> Model -> ( Model, Cmd Msg )

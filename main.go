@@ -30,10 +30,12 @@ func tweetHandler(rw http.ResponseWriter, req *http.Request) {
 		"CYX0Kwe8j4E57XemzbisiWhaOS0Y2Uoq5jp564Od7b1sP",
 	)
 
+	locations := req.FormValue("locations")
+
 	websocket.Handler(func(c *websocket.Conn) {
 		defer c.Close()
 		resp, err := client.Post("https://stream.twitter.com/1.1/statuses/filter.json", map[string]string{
-			"locations": "-142.29531250000002,21.07961382717576,-54.40468750000002,54.082101510457534",
+			"locations": locations,
 		})
 		if err != nil {
 			log.Println(err.Error())

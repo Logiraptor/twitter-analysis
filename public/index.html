@@ -33,6 +33,14 @@
                     points.push(coord);
                     heatmap.setData(points);
                 });
+
+                app.ports.resetView.subscribe(function() {
+                    points = [];
+                    var bounds = map.getBounds();
+                    var ne = bounds.getNorthEast();
+                    var sw = bounds.getSouthWest();
+                    app.ports.mapView.send([sw.lng(),sw.lat(),ne.lng(),ne.lat()]);
+                });
             }
         </script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA90Of7M7LqIJVI5Xa-vlqBGAyNvWfu3l4&callback=initMaps&libraries=visualization">
