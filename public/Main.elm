@@ -4,10 +4,11 @@ import Html.App as App
 import Html
 import WebSocket
 import Navigation
+import Json.Decode exposing (..)
 
 
 type alias Tweet =
-    String
+    { text : String, location : ( Float, Float ) }
 
 
 type alias Model =
@@ -45,7 +46,7 @@ view model =
 
 viewTweet : Tweet -> Html.Html Msg
 viewTweet tweet =
-    Html.text tweet
+    Html.text tweet.text
 
 
 subscriptions : Model -> Sub Msg
@@ -54,7 +55,11 @@ subscriptions model =
         url =
             "ws://" ++ model.location.host ++ "/tweets"
     in
-        WebSocket.listen url NewTweet
+        WebSocket.listen url
+            (decodeString decodeTweet
+                >> Result.withDefault { text = "Error", location = ( 0, 0 ) }
+                >> NewTweet
+            )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -75,3 +80,15 @@ update msg model =
 urlUpdate : Navigation.Location -> Model -> ( Model, Cmd Msg )
 urlUpdate loc model =
     ( { model | location = loc }, Cmd.none )
+
+
+decodeTweet : Decoder Tweet
+decodeTweet =
+    object2 Tweet
+        ("text" := string)
+        ("computed_coords" := decodeCoords)
+
+
+decodeCoords : Decoder ( Float, Float )
+decodeCoords =
+    at [ "coordinates" ] (tuple2 (,) float float)
