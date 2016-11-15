@@ -83,18 +83,28 @@ func getCoords(v Status) *geo {
 		fmt.Println("Coords is empty: ", v.Place)
 		return nil
 	}
-	if len(v.Place.BoundingBox.Coordinates[0]) != 4 {
-		fmt.Println("Polygon is not a quad: ", v.Place)
-		return nil
+
+	switch len(v.Place.BoundingBox.Coordinates[0]) {
+	case 4:
+		c := v.Place.BoundingBox.Coordinates[0]
+		return &geo{
+			Type: "Point",
+			Coordinates: [...]float32{
+				randFloat(c[0][0], c[2][0]),
+				randFloat(c[0][1], c[1][1]),
+			},
+		}
+	case 1:
+		c := v.Place.BoundingBox.Coordinates[0]
+		return &geo{
+			Type: "Point",
+			Coordinates: [...]float32{
+				float32(c[0][0]),
+				float32(c[0][1]),
+			},
+		}
 	}
-	c := v.Place.BoundingBox.Coordinates[0]
-	return &geo{
-		Type: "Point",
-		Coordinates: [...]float32{
-			randFloat(c[0][0], c[2][0]),
-			randFloat(c[0][1], c[1][1]),
-		},
-	}
+	return nil
 }
 
 func randFloat(a, b float64) float32 {
