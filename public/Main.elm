@@ -1,6 +1,7 @@
 port module Main exposing (..)
 
 import Html.App as App
+import Html.Attributes as Attributes
 import Html
 import WebSocket
 import Navigation
@@ -44,12 +45,18 @@ model loc =
 
 view : Model -> Html.Html Msg
 view model =
-    Html.div [] (List.map viewTweet model.tweets)
+    Html.div
+        [ Attributes.style
+            [ ( "height", "400px" )
+            , ( "overflow", "auto" )
+            ]
+        ]
+        (List.concatMap viewTweet model.tweets)
 
 
-viewTweet : Tweet -> Html.Html Msg
+viewTweet : Tweet -> List (Html.Html Msg)
 viewTweet tweet =
-    Html.text tweet.text
+    [ Html.text tweet.text, Html.br [] [] ]
 
 
 subscriptions : Model -> Sub Msg
@@ -75,7 +82,7 @@ update msg model =
             let
                 newTweets =
                     (tweet :: model.tweets)
-                        |> List.take 10
+                        |> List.take 100
             in
                 ( { model | tweets = newTweets }, coords tweet.location )
 
