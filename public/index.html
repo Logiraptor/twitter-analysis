@@ -13,46 +13,26 @@
         <script type="text/javascript" src="/main.js"></script>
         <script type="text/javascript">
             function initMaps() {
+                var points = [];
                 var map;
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 39.5, lng: -98.35},
                     zoom: 4
                 });
-       
+                var heatmap = new google.maps.visualization.HeatmapLayer({
+                    data: points,
+                    dissipating: true
+                });
+                heatmap.setMap(map);
+
                 var output = document.getElementById("elm-land");
-                Elm.Main.embed(output);
-                // var points = [];
-                
-                // var heatmap = new google.maps.visualization.HeatmapLayer({
-                //     data: points,
-                //     dissipating: true
-                // });
-                // heatmap.setMap(map);
+                var app = Elm.Main.embed(output);
 
-                // var loc = window.location, new_uri;
-                // new_uri = "ws:";
-                // new_uri += "//" + loc.host;
-                // new_uri += loc.pathname + "tweets";
-                // var ws = new WebSocket(new_uri);
-                // ws.onmessage = function(event) {
-                //     var data = JSON.parse(event.data);
-
-                //     if (data.computed_coords) {
-                //         var coords = data.computed_coords.coordinates;
-                //         points.push(new google.maps.LatLng(coords[1], coords[0]));
-
-                //         heatmap.setData(points);
-
-                //         var node = document.createTextNode(data.text);
-                //         output.appendChild(node);
-                //         output.appendChild(document.createElement("br"));
-
-                //         if (output.children.length > 100) {
-                //             output.removeChild(output.firstChild);
-                //             output.removeChild(output.firstChild);
-                //         }
-                //     }
-                // }
+                app.ports.coords.subscribe(function(data) {
+                    var coord = new google.maps.LatLng(data[1], data[0]);
+                    points.push(coord);
+                    heatmap.setData(points);
+                });
             }
         </script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA90Of7M7LqIJVI5Xa-vlqBGAyNvWfu3l4&callback=initMaps&libraries=visualization">

@@ -1,10 +1,13 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html.App as App
 import Html
 import WebSocket
 import Navigation
 import Json.Decode exposing (..)
+
+
+port coords : ( Float, Float ) -> Cmd msg
 
 
 type alias Tweet =
@@ -74,7 +77,7 @@ update msg model =
                     (tweet :: model.tweets)
                         |> List.take 10
             in
-                ( { model | tweets = newTweets }, Cmd.none )
+                ( { model | tweets = newTweets }, coords tweet.location )
 
 
 urlUpdate : Navigation.Location -> Model -> ( Model, Cmd Msg )
