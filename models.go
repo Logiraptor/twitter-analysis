@@ -25,7 +25,6 @@ type Status struct {
 	FilterLevel          string   `json:"filter_level"`
 	Lang                 string   `json:"lang"`
 	ComputedCoords       *geo     `json:"computed_coords"`
-	Bruh, Brah, Bro      bool
 }
 
 type place struct {
