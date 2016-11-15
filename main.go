@@ -18,7 +18,7 @@ import (
 func main() {
 	router := mux.NewRouter()
 	router.Path("/tweets").HandlerFunc(tweetHandler)
-	router.Path("/").Handler(http.FileServer(http.Dir("public")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
 	http.ListenAndServe(":"+os.Getenv("PORT"), router)
 }
 

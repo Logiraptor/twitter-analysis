@@ -8,49 +8,51 @@
         </style>
         <div class="content">
             <div class="map" id="map"></div>
-            <div class="bounded" id="output"></div>
+            <div id="elm-land"></div>
         </div>
+        <script type="text/javascript" src="/main.js"></script>
         <script type="text/javascript">
-            function initMaps() {            
-                var output = document.getElementById("output");
-                var points = [];
-
+            function initMaps() {
                 var map;
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 39.5, lng: -98.35},
                     zoom: 4
                 });
+       
+                var output = document.getElementById("elm-land");
+                Elm.Main.embed(output);
+                // var points = [];
                 
-                var heatmap = new google.maps.visualization.HeatmapLayer({
-                    data: points,
-                    dissipating: true
-                });
-                heatmap.setMap(map);
+                // var heatmap = new google.maps.visualization.HeatmapLayer({
+                //     data: points,
+                //     dissipating: true
+                // });
+                // heatmap.setMap(map);
 
-                var loc = window.location, new_uri;
-                new_uri = "ws:";
-                new_uri += "//" + loc.host;
-                new_uri += loc.pathname + "tweets";
-                var ws = new WebSocket(new_uri);
-                ws.onmessage = function(event) {
-                    var data = JSON.parse(event.data);
+                // var loc = window.location, new_uri;
+                // new_uri = "ws:";
+                // new_uri += "//" + loc.host;
+                // new_uri += loc.pathname + "tweets";
+                // var ws = new WebSocket(new_uri);
+                // ws.onmessage = function(event) {
+                //     var data = JSON.parse(event.data);
 
-                    if (data.computed_coords) {
-                        var coords = data.computed_coords.coordinates;
-                        points.push(new google.maps.LatLng(coords[1], coords[0]));
+                //     if (data.computed_coords) {
+                //         var coords = data.computed_coords.coordinates;
+                //         points.push(new google.maps.LatLng(coords[1], coords[0]));
 
-                        heatmap.setData(points);
+                //         heatmap.setData(points);
 
-                        var node = document.createTextNode(data.text);
-                        output.appendChild(node);
-                        output.appendChild(document.createElement("br"));
+                //         var node = document.createTextNode(data.text);
+                //         output.appendChild(node);
+                //         output.appendChild(document.createElement("br"));
 
-                        if (output.children.length > 100) {
-                            output.removeChild(output.firstChild);
-                            output.removeChild(output.firstChild);
-                        }
-                    }
-                }
+                //         if (output.children.length > 100) {
+                //             output.removeChild(output.firstChild);
+                //             output.removeChild(output.firstChild);
+                //         }
+                //     }
+                // }
             }
         </script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA90Of7M7LqIJVI5Xa-vlqBGAyNvWfu3l4&callback=initMaps&libraries=visualization">
