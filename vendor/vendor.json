@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "urMd7A9QPAJYY0GZJL9qBhlUmD8=",
+			"path": "github.com/gorilla/mux",
+			"revision": "757bef944d0f21880861c2dd9c871ca543023cba",
+			"revisionTime": "2016-09-20T23:08:13Z"
+		},
+		{
+			"checksumSHA1": "4nd5J4bz9bwh5XDRdTZRB78T2tU=",
+			"path": "github.com/mrjones/oauth",
+			"revision": "88427e754deb856c87036b0f91c069bc4f6a1411",
+			"revisionTime": "2016-10-24T00:09:04Z"
+		},
+		{
+			"checksumSHA1": "O2sws+miRriMPObINsbwa0jnXxE=",
+			"path": "golang.org/x/net/websocket",
+			"revision": "65dfc08770ce66f74becfdff5f8ab01caef4e946",
+			"revisionTime": "2016-10-24T22:38:16Z"
+		}
+	],
+	"rootPath": "github.com/Logiraptor/twitter-stream"
+}
