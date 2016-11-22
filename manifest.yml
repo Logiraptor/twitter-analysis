@@ -1,0 +1,4 @@
+name: twitter-stream
+buildpack: go_buildpack
+env:
+    GOPACKAGENAME: main
